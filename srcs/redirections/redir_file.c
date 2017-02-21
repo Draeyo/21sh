@@ -35,12 +35,16 @@ static int		redir_file_output(t_env *e, char *ret_output)
 {
 	int		fd_output;
 	int		nb_red;
+	int		red_type;
 
+	red_type = 0;
 	nb_red = nombrederedirectionsdanslacommande(e);
 	fd_output = 0;
 	while (nb_red-- && struct_find_out(e))
 	{
-		if ((fd_output = open(e->magic[++RED_INDEX].cmd, ONE_RED_FLAGS, OPENFLAGS)) > -1)
+		red_type = ft_strcmp(e->magic[RED_INDEX].cmd, ">>");
+		if ((fd_output = open(e->magic[++RED_INDEX].cmd, (!red_type ? TWO_RED_FLAGS : ONE_RED_FLAGS),\
+			OPENFLAGS)) > -1)
 		{
 			// NE PAS ENLEVER
 			ft_printfd(fd_output, "%s", ret_output);
@@ -50,7 +54,7 @@ static int		redir_file_output(t_env *e, char *ret_output)
 			ft_error(SH_NAME, "failed opening file",\
 					e->magic[RED_INDEX].cmd ? e->magic[RED_INDEX].cmd : NULL);
 	}
-	free(ret_output);
+	strfree(&ret_output);
 	return (1);
 }
 
@@ -70,7 +74,7 @@ int				redir_fill_output(t_env *e)
 			ret_output = ft_strdup(tmp);
 		else if ((tmp_join = ft_strjoin(ret_output, tmp)))
 		{
-				free(ret_output);
+				strfree(&ret_output);
 				ret_output = tmp_join;
 		}
 	}

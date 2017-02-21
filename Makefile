@@ -6,7 +6,7 @@
 #    By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/13 14:50:23 by vlistrat          #+#    #+#              #
-#    Updated: 2017/02/13 18:39:03 by vlistrat         ###   ########.fr        #
+#    Updated: 2017/02/21 13:19:05 by kboddez          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,26 +21,27 @@ SRC_SHELL 			= $(addprefix shell/,$(SRC_SHELL_NAME))
 SRC_RED_NAME 		= redir_iteration.c redir_output.c redir_file.c
 SRC_RED 			= $(addprefix redirections/,$(SRC_RED_NAME))
 
-## TOOLS FOLDER ##
-SRC_TOOLS_NAME 		= ft_banner.c ft_error.c ft_realloc_line.c ft_realloc_tab.c \
-					  ft_tools.c ft_remove_space.c
-SRC_TOOLS			= $(addprefix tools/,$(SRC_TOOLS_NAME))
-
 ## STRUCT FOLDER ##
 SRC_STRUCT_NAME		= struct_get_type.c struct_strsplit.c struct_strsplit_quote.c \
 					  struct_tools.c
 SRC_STRUCT			= $(addprefix struct/,$(SRC_STRUCT_NAME))
 
 ## TCAPS FOLDER ##
-SRC_TCAPS_NAME		= ft_paste.c tcaps.c tcaps_arrow.c tcaps_check.c tcaps_ctrl.c \
+SRC_TCAPS_NAME		= tcaps_paste.c tcaps.c tcaps_arrow.c tcaps_check.c \
 					  tcaps_cut_paste.c tcaps_delete.c tcaps_history.c \
-					  tcaps_insert.c tcaps_positions.c
+					  tcaps_insert.c tcaps_positions.c tcaps_putstr.c \
+					  tcaps_ctrl_home_end.c tcaps_ctrl_arrow.c tcaps_clear.c
 SRC_TCAPS			= $(addprefix tcaps/,$(SRC_TCAPS_NAME))
 
 ## BUILTINS FOLDER ##
 SRC_BUILTINS_NAME	= ft_chdir.c ft_echo.c ft_env.c ft_exit.c ft_history.c \
 					  ft_reset.c ft_setenv.c ft_unsetenv.c ft_where.c
 SRC_BUILTINS		= $(addprefix builtins/,$(SRC_BUILTINS_NAME))
+
+## TOOLS FOLDER ##
+SRC_TOOLS_NAME 		= ft_banner.c ft_error.c ft_realloc_line.c ft_realloc_tab.c \
+					  ft_tools.c ft_remove_space.c ft_tabzero.c
+SRC_TOOLS			= $(addprefix tools/,$(SRC_TOOLS_NAME))
 
 ## ALL FILES ##
 SRC_NAME			= $(SRC_SHELL) $(SRC_RED) $(SRC_TOOLS) $(SRC_STRUCT) \

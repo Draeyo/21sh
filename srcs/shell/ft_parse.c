@@ -6,7 +6,7 @@
 /*   By: lfabbro <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/21 18:55:15 by lfabbro           #+#    #+#             */
-/*   Updated: 2017/02/13 19:37:26 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/02/21 13:15:10 by kboddez          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char		*ft_tilde(t_env *e, char *current)
 	if (!(home = ft_getenv(e->env, "HOME")))
 		return (NULL);
 	ret = ft_strjoin(home, &current[1]);
-	free(home);
+	strfree(&home);
 	return (ret);
 }
 
@@ -35,7 +35,7 @@ int		ft_subs_tilde(t_env *e)
 		if (e->cmd[k][0] == '~')
 		{
 			tmp = ft_tilde(e, e->cmd[k]);
-			free(e->cmd[k]);
+			strfree(&e->cmd[k]);
 			e->cmd[k] = tmp;
 		}
 	return (0);
@@ -47,8 +47,8 @@ char		**ft_trim_split_cmd(t_env *e)
 	char	*trline;
 
 	trline = ft_strxtrim_quote(e->line, '\t');
-	cmds = ft_strsplit(trline, ';');
-	free(trline);
+	cmds = ft_strsplit_quote(trline, ';');
+	ft_strdel(&trline);
 	return (cmds);
 }
 
@@ -82,25 +82,26 @@ int				ft_iter_pipes(t_env *e, char *cmds_i)
 	int		ret;
 
 	i = -1;
+	ret = 0;
 	FD.in = STDIN_FILENO;
 	e->cmd = ft_strsplit_quote(cmds_i, ' ');
 	e->magic = struct_strsplit_quote(cmds_i, ' ');
 	e->cat = ft_cmds_split(e);
-/*	for (int j = 0 ; e->cat[j]; j++)
+/*
+  for (int j = 0 ; e->cat[j]; j++)
 		for (int k = 0; e->cat[j][k]; k++)
-			ft_printf("cat[%d][%d] : %s\n", j, k, e->cat[j][k]);*/
+			ft_printf("cat[%d][%d] : %s\n", j, k, e->cat[j][k]);
+*/
 	magic_type(e);
 	while (e->cat[++i + 1] && ret != -1)
-		ret = redir_exec_open(i, e); // WIP
+		ret = redir_exec_open(i, e);
 	ret = redir_last_cmd(i, e);
-	if (FD.last_red)
-	{
-		free(FD.last_red);
-		FD.last_red = NULL;
-	}
 	ft_check_history(e);
 	ft_triple_free(e);
 	magic_free(e);
+	RED_INDEX = 0;
+	ft_free_tab(e->cmd);
+	e->cmd = NULL;
 	return (ret);
 }
 
@@ -120,7 +121,6 @@ int				ft_parse_line(t_env *e)
 				ret = ft_iter_pipes(e, cmds[i]);
 			else
 				ft_error(NULL, "Unmatched quote", NULL);
-			e->check_remove_tab = 0;
 		}
 	}
 	ft_free_tab(cmds);
