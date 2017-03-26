@@ -11,17 +11,19 @@ static int	ctrl_up_is_not_on_prompt(t_env *e)
 **  INSTRUCTION FOR "Ctrl + ARROW ->" KEYS
 */
 
-void	tcaps_ctrl_mov_right(t_env *e)
+void		tcaps_ctrl_mov_right(t_env *e)
 {
 	int	i;
 
 	i = TCAPS.nb_move;
-	while (i < TCAPS.nb_read && ft_isalpha(e->line[i + 1]))
+	while (i < TCAPS.nb_read && ft_isalpha(e->line[i + 1])
+			&& is_number(e->line[i - 1]))
 	{
 		move_right(e);
 		++i;
 	}
-	while (i < TCAPS.nb_read && !ft_isalpha(e->line[i + 1]))
+	while (i < TCAPS.nb_read && (!ft_isalpha(e->line[i + 1])
+				|| !is_number(e->line[i - 1])))
 	{
 		move_right(e);
 		++i;
@@ -31,23 +33,23 @@ void	tcaps_ctrl_mov_right(t_env *e)
 }
 
 /*
- **  INSTRUCTION FOR "Ctrl + ARROW <-" KEYS
- */
+**  INSTRUCTION FOR "Ctrl + ARROW <-" KEYS
+*/
 
-void	tcaps_ctrl_mov_left(t_env *e)
+void		tcaps_ctrl_mov_left(t_env *e)
 {
 	int	i;
 
 	i = TCAPS.nb_move;
-	while (i > 0 && !ft_isalpha(e->line[i - 1]))
+	while (i > 0 && !ft_isalpha(e->line[i - 1]) && !is_number(e->line[i - 1]))
 	{
-		xputs("le");
+		xputs(TGETSTR_LE);
 		--TCAPS.nb_move;
 		--i;
 	}
-	while (i >= 0 && ft_isalpha(e->line[i - 1]))
+	while (i >= 0 && (ft_isalpha(e->line[i - 1]) || is_number(e->line[i - 1])))
 	{
-		xputs("le");
+		xputs(TGETSTR_LE);
 		--TCAPS.nb_move;
 		--i;
 	}
@@ -71,7 +73,7 @@ static void	tcaps_ctrl_up_down(t_env *e, char buf[3])
 		{
 			while (line--)
 			{
-				xputs("le");
+				xputs(TGETSTR_LE);
 				--TCAPS.nb_move;
 			}
 			tcaps_recalc_pos(e);
@@ -85,15 +87,14 @@ static void	tcaps_ctrl_up_down(t_env *e, char buf[3])
 }
 
 /*
- **  INSTRUCTION FOR "Ctrl + ARROW" KEYS
- **
- **	tcaps_check_key(buf, 59, 53, 68)): Ctrl + LEFT  arrow
- **	NOT YET tcaps_check_key(buf, 59, 53, 67)): Ctrl + RIGHT arrow
- */
+**  INSTRUCTION FOR "Ctrl + ARROW" KEYS
+**
+**	tcaps_check_key(buf, 59, 53, 68)): Ctrl + LEFT  arrow
+**	NOT YET tcaps_check_key(buf, 59, 53, 67)): Ctrl + RIGHT arrow
+*/
 
-void	tcaps_ctrl_arrow(t_env *e)
+void		tcaps_ctrl_arrow(t_env *e)
 {
-	int		i;
 	char	buf[3];
 
 	read(0, buf, 3);

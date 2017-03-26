@@ -1,44 +1,55 @@
 #include "shell.h"
 
-int			ft_matchquotes(char *s)
+int		ft_check_file_perm(char *file)
+{
+	int		ret;
+
+	ret = 0;
+	if (access(file, F_OK) != -1)
+	{
+		if (access(file, R_OK) == -1)
+		{
+			ft_error(SH_NAME, "Cannot access file for reading", file);
+			ret = -1;
+		}
+		if (access(file, W_OK) == -1)
+		{
+			ft_error(SH_NAME, "Cannot access file for writing", file);
+			ret = -1;
+		}
+	}
+	return (ret);
+}
+
+int		ft_matchquotes(char *s)
 {
 	int		i;
+	int		bs;
 	char	quote;
 
 	i = 0;
+	bs = 0;
 	quote = '\0';
 	while (s[i])
 	{
-		if (quote != '\0' && s[i] == quote)
-			quote = '\0';
-		else if (quote == '\0' && (s[i] == '\'' || s[i] == '\"'))
-			quote = s[i];
+		if (!bs && s[i] == '\\' && quote != '\'')
+			bs = 1;
+		else
+		{
+			if (quote == '\0' && !bs && (s[i] == '\'' || s[i] == '\"'))
+				quote = s[i];
+			else if (s[i] == quote && ((!bs && quote == '\"') || quote == '\''))
+				quote = '\0';
+			bs = 0;
+		}
 		++i;
 	}
 	if (quote != '\0')
-		return (quote);
-	return (0);
+		return (0);
+	return (1);
 }
 
-void		ft_env_free(t_env *e)
-{
-	if (e->line)
-		strfree(&e->line);
-	if (e->home)
-		strfree(&e->home);
-	if (TCAPS.term_name)
-		strfree(&TCAPS.term_name);
-	if (e->history)
-		ft_free_tab(e->history);
-	if (e->prompt)
-		strfree(&e->prompt);
-	if (e->env)
-		ft_free_tab(e->env);
-	if (e->magic)
-		magic_free(e);
-}
-
-char		*ft_issetenv(char **env, char *name)
+char	*ft_issetenv(char **env, char *name)
 {
 	char	*eval;
 	int		i;
@@ -60,7 +71,7 @@ char		*ft_issetenv(char **env, char *name)
 	return (NULL);
 }
 
-char		*ft_getenv(char **env, char *name)
+char	*ft_getenv(char **env, char *name)
 {
 	char	*value;
 	char	*tmp;
@@ -70,37 +81,6 @@ char		*ft_getenv(char **env, char *name)
 	if ((tmp = ft_issetenv(env, name)) != NULL)
 	{
 		value = ft_strdup(ft_strchr(tmp, '=') + 1);
-	//	free(tmp);
 	}
 	return (value);
-}
-
-void	xputs(char *tag)
-{
-	char	*res;
-
-	res = tgetstr(tag, NULL);
-	tputs(res, 1, dsh_putchar);
-}
-
-void	move_right(t_env *e)
-{
-	if (TCAPS.nb_col == (WIN_WIDTH - 1))
-	{
-		xputs("do");
-		xputs("cr");
-	}
-	else
-		xputs("nd");
-	++TCAPS.nb_move;
-	tcaps_recalc_pos(e);
-}
-
-void	strfree(char **str)
-{
-	if (*str)
-	{
-		free(*str);
-		*str = NULL;
-	}
 }

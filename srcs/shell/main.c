@@ -1,5 +1,19 @@
 #include "shell.h"
 
+void			tcaps_prompt(char *prompt)
+{
+	tputs(GREEN, 1, dsh_putchar);
+	tputs(prompt, 1, dsh_putchar);
+	tputs(ENDC, 1, dsh_putchar);
+}
+
+void			ft_prompt(char *prompt)
+{
+	ft_putstr(GREEN);
+	ft_putstr(prompt);
+	ft_putstr(ENDC);
+}
+
 /*
 **	INSTRUCTIONS FOR ENTER KEY
 **	tcaps_ctrl_end moves the cursor to the eol,
@@ -8,17 +22,15 @@
 
 static void		tcaps_enter(t_env *e)
 {
+	if (!ft_multiline(e))
+		return ;
 	tcaps_ctrl_end(e);
 	ft_putchar('\n');
-	if (e->line && ft_parse_line(e))
+	if (e->line && ft_parse_line(e) && ft_strcmp(e->line, "exit"))
 		ft_putchar('\n');
 	if (e->x)
-		ft_putstr(e->prompt);
-	TCAPS.hist_move = -1;
-	TCAPS.nb_move = 0;
-	TCAPS.nb_read = 0;
-	strfree(&e->line);
-	e->line = NULL;
+		tcaps_prompt(e->prompt);
+	ft_reset_line(e);
 }
 
 /*
@@ -33,81 +45,100 @@ static void		tcaps_del_prompt(t_env *e)
 	len = (int)ft_strlen(e->prompt);
 	while (len-- >= 0)
 	{
-		xputs("le");
-		xputs("ce");
+		xputs(TGETSTR_LE);
+		xputs(TGETSTR_CE);
 	}
 }
 
-static void		tcaps_manage_printable_char(t_env *e)
+void		tcaps_manage_printable_char(t_env *e)
 {
-	if (TCAPS.nb_move == TCAPS.nb_read)
+	int		len;
+	int		s_move;
+
+	s_move = 0;
+	len = NB_READ;
+	if (NB_MOVE == NB_READ)
 		e->line = ft_realloc_line(e, BUF[0]);
 	else
 	{
-		int		l = NB_READ;
-		int		s_move = 0;
-
 		e->line = ft_realloc_insert_char(e, BUF[0]);
-		xputs("dm");
-		while (--l > 0)
+		xputs(TGETSTR_DM);
+		while (--len > 0)
 		{
-			xputs("le");
-			xputs("ce");
+			xputs(TGETSTR_LE);
+			xputs(TGETSTR_CE);
 		}
 		tcaps_del_prompt(e);
-		ft_putstr(e->prompt);
+		tcaps_prompt(e->prompt);
 		s_move += ft_putstr(e->line);
 		while (s_move-- > NB_MOVE)
-			xputs("le");
+			xputs(TGETSTR_LE);
 		tcaps_recalc_pos(e);
 		if (TCAPS.nb_col == (WIN_WIDTH - 1))
 		{
-			xputs("do");
-			xputs("cr");
+			xputs(TGETSTR_DW);
+			xputs(TGETSTR_CR);
 		}
 		else
-			xputs("nd");
+			xputs(TGETSTR_ND);
 	}
 	++NB_MOVE;
 	++NB_READ;
 }
 
-static int		tcaps_is_delete_key(t_env *e)
+int		tcaps_is_delete_key(t_env *e)
 {
-	if (e->line && e->buf[0] == 127 && TCAPS.nb_move > 0)
+	if (e->line && e->buf[0] == 127 && NB_MOVE > 0)
 		return (1);
 	return (0);
 }
 
-int				main(int ac, char **av, char **env)
+static void		reading_loop(t_env *e)
 {
-	t_env	e;
-
-	ft_init(&e, ac, av, env);
-	ft_banner(&e);
-	ft_set_sig_handler();
-	while (e.x)
+	while (e->x)
 	{
-		read(0, e.buf, 3);
-		if (ft_check_ctrlc(0))
-			ft_reset_line(&e);
-		tcaps_recalc_pos(&e);
-		if (!e.tcaps.check_move)
-			e.tcaps.nb_move = e.tcaps.nb_read;
-		if (tcaps_is_printable(e.buf))
-			tcaps_manage_printable_char(&e);
-		else if (tcaps_is_delete_key(&e))
-			e.line = ft_realloc_delete_char(&e);
-		if (tcaps_check_key(e.buf, 10, 0, 0))
-			tcaps_enter(&e);
+		read(0, BUF, 3);
+		if (e->check_ctrl_c)
+			ft_reset_line(e);
+		if (e->check_sigtstp)
+			tcaps_init(e);
+		tcaps_recalc_pos(e);
+		if (!TCAPS.check_move)
+			NB_MOVE = NB_READ;
+		if (tcaps_is_printable(BUF))
+			tcaps_manage_printable_char(e);
+		else if (tcaps_is_delete_key(e))
+			e->line = ft_realloc_delete_char(e, NB_MOVE - 1);
+		if (tcaps_check_key(BUF, 10, 0, 0))
+			tcaps_enter(e);
 		else
-			tcaps(&e);
-		ft_bzero(&e.buf, 3);
-		e.i_mag = 0;
-		if (e.tcaps.nb_move < e.tcaps.nb_read)
-			e.tcaps.check_move = 1;
+			tcaps(e);
+		ft_bzero(&BUF, 3);
+		RED_INDEX = 0;
+		if (NB_MOVE < NB_READ)
+			TCAPS.check_move = 1;
 	}
-	ft_env_free(&e);
+}
+
+/*
+** for now we handle ctrl-z, later on we will get rid of that
+*/
+
+int				main(int UNUSED(ac), char **UNUSED(av), char **env)
+{
+	t_env	*e;
+	int		ret;
+
+	e = (t_env *)malloc(sizeof(t_env));
+	env_access(e);
+	ft_init(e, env);
+	ft_banner();
+	ft_set_sig_handler();
+	ft_prompt(e->prompt);
+	reading_loop(e);
+	ft_write_history(e, O_TRUNC);
+	ret = e->exit;
+	ft_env_free(e);
 	ft_putendl("exit");
-	return (e.exit);
+	return (ret);
 }

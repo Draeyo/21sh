@@ -4,76 +4,87 @@
 **		ADD NEW CMD TO THE END OF THE HISTORY TAB
 */
 
-void	ft_check_history(t_env *e)
+void		ft_store_history(t_env *e)
 {
-	int		i;
-	int		accs;
-	char	**tmp;
+	char		**tmp;
+	int			is_not_history_cmd;
+//	static char	*e->last_cmd = NULL;
 
-	accs = access(HIST_FILE, F_OK);
-	ft_store_history(e->line);
 	tmp = NULL;
-	if (accs != -1)
+	tmp = e->history;
+	is_not_history_cmd = ft_strcmp(e->line, "history");
+	if (is_not_history_cmd ||
+		(e->last_cmd && ft_strcmp(e->last_cmd, "history")) || !e->last_cmd)
 	{
-		i = ft_tablen(e->history);
-
-		if (!ft_strcmp(e->history[i], e->line))
-		{
-			tmp = e->history;
-			e->history = ft_tabcat(e->history, e->line);
-			if (tmp)
-				ft_free_tab(tmp);
-		}
+		e->history = ft_tabcat(e->history, e->line);
+		if (tmp)
+			ft_free_tab(tmp);
 	}
-	else if (e->history)
-	{
-		ft_free_tab(e->history);
-		e->history = NULL;
-		ft_read_history(e);
-	}
-	else
-		ft_read_history(e);
+	strfree(&e->last_cmd);
+	e->last_cmd = ft_strdup(e->line);
 }
 
 /*
-**		OPEN /tmp/.history AND STORE IT IN
+**		OPEN ~/.sh_history AND STORE IT IN
 **		e->history TAB
 */
 
-int		ft_read_history(t_env *e)
+int			ft_read_history(t_env *e)
 {
-	int			fd;
-	int 		i;
+	int		history_fd;
+	int		i;
+	int		nb_lines;
 
 	i = 0;
-	if ((fd = open(HIST_FILE, O_RDONLY, OPENFLAGS)) == -1)
+	if ((history_fd = open(HIST_FILE, O_RDWR | O_CREAT, OFLAGS)) == -1)
 		return (ft_error(SH_NAME, "Cannot read", HIST_FILE));
+	nb_lines = 0;
 	if ((e->history = malloc(sizeof(e->history) * 4096)) == NULL)
-		//CLOSE FD BEFORE QUITTING
 		return (ft_error(SH_NAME, "Malloc failed.", NULL));
-	while (get_next_line(fd, &e->history[i]) > 0)
+	while (++nb_lines < 4096 && get_next_line(history_fd, &e->history[i]) > 0)
 		++i;
 	e->history[i] = NULL;
-	if (close(fd) == -1)
-		ft_printfd(2, "MANAGE ERROR");
 	return (0);
 }
 
 /*
-**		CREATE OR OPEN .history FILE
+**		CREATE OR OPEN .sh_history FILE
 **		CONCAT WITH THE NEW CMD
 */
 
-int		ft_store_history(char *cmd)
+int			ft_write_history(t_env *e, int flag)
 {
-	int			fd;
+	int		history_fd;
+	int		len_tab;
+	int		i;
+	char	*tmp;
 
-	if ((fd = open(HIST_FILE, O_RDWR | O_CREAT | O_APPEND, OPENFLAGS)) == -1)
-		return (-1);
-	ft_putstr_fd(cmd, fd);
-	ft_putchar_fd('\n', fd);
-	if (close(fd) == -1)
-		return (ft_error("close", "Could not close file", HIST_FILE));
+	tmp = NULL;
+	flag = (e->trunc_in_history) ? O_TRUNC : flag;
+	if ((history_fd = open(HIST_FILE, O_RDWR | O_CREAT | flag, OFLAGS)) == -1)
+		return (ft_error(SH_NAME, "Cannot open history file", HIST_FILE));
+	len_tab = ft_tablen(e->history);
+	i = -1;
+	while (++i < len_tab)
+	{
+		tmp = ft_strjoin(e->history[i], "\n");
+		write(history_fd, tmp, (int)ft_strlen(tmp));
+		strfree(&tmp);
+	}
+	ft_close(history_fd);
+	return (1);
+}
+
+/*
+**	CHECK IF OPTION IS PRESENT IN CMD
+*/
+
+int			is_option(int i, char **cmd, char *option)
+{
+	if (!cmd[i])
+		return (0);
+	if (ft_strstr(cmd[i], option))
+			return (1);
 	return (0);
 }
 
@@ -82,13 +93,29 @@ int		ft_store_history(char *cmd)
 **		PRINT CMD HISTORY
 */
 
-int		ft_history(t_env *e)
+int			ft_history(t_env *e, char **cmd, int i)
 {
-	int		i;
-
-	i = -1;
-	if (e->history)
-		while (e->history[++i])
-			ft_printf("%d: %s\n", (i + 1), e->history[i]);
-	return (0);
+	if (i == 1 && !is_valid_arg(cmd, SH_NAME))
+		return (-1);
+	if (!e->history)
+		return (0);
+	if (is_option(i, cmd, "-d"))
+		history_delete(e, cmd, i);
+	else if (is_option(i, cmd, "-w"))
+		ft_write_history(e, O_TRUNC);
+	else if (is_option(i, cmd, "-a"))
+		ft_write_history(e, O_APPEND);
+	else if (is_option(i, cmd, "-c"))
+		clear_history_list(e);
+	else if (is_option(i, cmd, "-r"))
+		append_history_file_in_list(e);
+	else if (is_option(i, cmd, "-h"))
+		print_history_help();
+//	else if (is_option(i,cmd, "-p"))
+//		substitution
+	else if (e->history)
+		print_history(e, cmd);
+	if (cmd[i + 1] && !is_redirection(e, i + 1))
+		return (ft_history(e, cmd, i + 1));
+	return (1);
 }
