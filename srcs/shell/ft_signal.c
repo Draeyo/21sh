@@ -6,7 +6,7 @@
 /*   By: lfabbro <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/29 17:31:41 by lfabbro           #+#    #+#             */
-/*   Updated: 2017/03/17 12:57:31 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/04 15:33:42 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,9 @@ void		ft_set_sig_handler(void)
 	sig = 0;
 	while (++sig <= 31)
 	{
-		if (sig == SIGSTOP || sig == SIGCONT || sig == SIGSEGV || sig == SIGKILL
+		if (sig == SIGSTOP || sig == SIGSEGV || sig == SIGKILL
 				|| sig == SIGBUS || sig == SIGFPE)
 			signal(sig, SIG_DFL);
-//		else if (sig == SIGTSTP)
-//			signal(sig, SIG_DFL);
 		else
 			signal(sig, ft_sig_handler);
 	}
@@ -89,33 +87,19 @@ void		ft_sig_handler(int sig)
 
 	e = env_access(NULL);
 	if (sig == SIGINT)
-	{
-		e->check_ctrl_c = 1;
-		if (e->c_match)
-		{
-			e->check_ctrl_c = 0;
-			e->selected = -42;
-			print_auto_completion(e, NULL, NULL, NULL);
-			xputs(e->struct_tputs.cd);
-			valid_selection(e);
-		}
-		else if (!e->child_running)
-		{
-			tcaps_ctrl_end(e);
-			strfree(&MULTI);
-			TCAPS.hist_move = -1;
-			ft_putchar('\n');
-			strfree(&e->prompt);
-			e->prompt = ft_strdup(STD_PROMPT);
-			tcaps_prompt(e->prompt);
-		}
-	}
+		ft_sigint(e);
 	else if (sig == SIGTSTP)
 	{
-		e->check_sigtstp = 1;
 		tcaps_ctrl_end(e);
-		tcaps_reset();
+		tcaps_reset(e);
 		signal(sig, SIG_DFL);
 		raise(sig);
+	}
+	else if (sig == SIGCONT)
+	{
+		if (!e->raw)
+			ft_prompt(e->prompt);
+		tcsetattr(STDIN_FILENO, TCSANOW, e->new_term);
+		signal(SIGTSTP, ft_sig_handler);
 	}
 }

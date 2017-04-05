@@ -17,96 +17,22 @@ static int	ft_start_with_bis(char *str, char *comp)
 	return (1);
 }
 
-int			ft_sort(void *one, void *two)
-{
-	const char *top;
-	const char *kek;
-
-	top = one;
-	kek = two;
-	if (ft_strcmp(top, kek) > 0)
-		return (0);
-	else
-		return (1);
-}
-
-int			ft_lstswap(t_list *one, t_list *two)
-{
-	int		tmp_content_size;
-	char	*tmp_content;
-
-	tmp_content = one->content;
-	one->content = two->content;
-	two->content = tmp_content;
-	tmp_content_size = one->content_size;
-	one->content_size = two->content_size;
-	two->content_size = tmp_content_size;
-	return (1);
-}
-
-t_list		*ft_sort_list(t_list *lst, int (*cmp)(void *, void *))
-{
-	int		modif;
-	void	*flst;
-
-	if (!cmp || !lst)
-		return (NULL);
-	flst = lst;
-	modif = 1;
-	while (modif == 1)
-	{
-		modif = 0;
-		lst = flst;
-		while (lst && lst->next)
-		{
-			if (cmp(lst->content, lst->next->content) == 0)
-				modif = ft_lstswap(lst, lst->next);
-			lst = lst->next;
-		}
-	}
-	return (flst);
-}
-
-void		ft_add_list(t_list **first, t_list **ptr, char *str)
-{
-	if (!*first)
-	{
-		*first = ft_lstnew(str, ft_strlen(str) + 1);
-		*ptr = *first;
-	}
-	else
-	{
-		(*ptr)->next = ft_lstnew(str, ft_strlen(str) + 1);
-		*ptr = (*ptr)->next;
-	}
-}
-
-int			ft_countchar(char *str, char c)
-{
-	int i;
-
-	i = 0;
-	while (*str)
-	{
-		if (*str == c)
-			++i;
-		++str;
-	}
-	return (i);
-}
-
-char		*escape_spaces(char *str)
+char		*escape_specials(char *str, int i, int len)
 {
 	char	*tmp;
 	char	*ret;
 	int		k;
 
-	k = ft_countchar(str, ' ') + ft_countchar(str, '	');
-	tmp = ft_strnew(strlen(str) + k);
+	k = ft_countchar(str, ' ') + ft_countchar(str, '	')
+	+ ft_countchar(str, '\'') + ft_countchar(str, '\"');
+	tmp = ft_strnew(ft_strlen(str) + k);
 	ret = tmp;
-	while (*str)
+	ft_strncpy(tmp, str, i);
+	str += i;
+	tmp += i;
+	while (*str && len)
 	{
-		if (*str == ' ' || *str == '	')
+		if (*str == ' ' || *str == '	' || *str == '\'' || *str == '\"')
 		{
 			*tmp = '\\';
 			tmp++;
@@ -114,7 +40,9 @@ char		*escape_spaces(char *str)
 		*tmp = *str;
 		++tmp;
 		++str;
+		--len;
 	}
+	ft_strcpy(tmp, str);
 	return (ret);
 }
 
@@ -129,17 +57,18 @@ int			cur_inquote(t_env *e)
 	pos = NB_MOVE - 1;
 	while (e->line[pos] && pos)
 	{
-		if (e->line[pos] == '\'')
+		if (e->line[pos] == '\'' && e->line[pos - 1] != '\\')
 			s_quote++;
-		else if (e->line[pos] == '\"')
+		else if (e->line[pos] == '\"' && e->line[pos - 1] != '\\')
 			d_quote++;
 		pos--;
 	}
+	pos = 0;
 	if (d_quote % 2)
-		return (1);
+		pos += 2;
 	if (s_quote % 2)
-		return (1);
-	return (0);
+		pos += 1;
+	return (pos);
 }
 
 t_list		*dir_to_list(t_env *e, char *curr_path)
@@ -156,7 +85,7 @@ t_list		*dir_to_list(t_env *e, char *curr_path)
 	while ((dir_entry = readdir(dir_id)) != NULL)
 	{
 		if (!cur_inquote(e))
-			tmp = escape_spaces(dir_entry->d_name);
+			tmp = escape_specials(dir_entry->d_name, 0, -1);
 		else
 			tmp = ft_strdup(dir_entry->d_name);
 		if (ft_strcmp(tmp, ".") && ft_strcmp(tmp, ".."))
@@ -177,7 +106,8 @@ char		**get_valid_content_from_path(t_env *e, char *curr_path, char *arg)
 	t_list			*ptr;
 
 	content = NULL;
-	sorted_files = ft_sort_list(dir_to_list(e, curr_path), ft_sort);
+	sorted_files = dir_to_list(e, curr_path);
+	merge_sort(&sorted_files);
 	ptr = sorted_files;
 	while (ptr)
 	{

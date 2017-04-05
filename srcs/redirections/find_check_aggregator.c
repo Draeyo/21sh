@@ -4,27 +4,18 @@
 #define INPUT_AGGRE     0
 #define OUTPUT_AGGRE    1
 
-typedef struct	s_aggre_elems
-{
-	int			nb_chevron;
-	int			nb_ampersand;
-	int			type;
-}				t_aggre_elems;
-
 static int		nb_elems_is_invalid(t_aggre_elems *ag)
 {
 	int error;
 
 	error = 0;
 	if (ag->nb_chevron > 1)
-		error = dprintf(STDERR_FILENO, "sh: syntax error - too many\
-				chevrons in your aggregator\n");
+		error = ft_printfd(STDERR_FILENO, "%s: syntax error - too many chevrons in your aggregator\n", SH_NAME);
+	// too many ... 'chevrons' ??
 	else if (ag->nb_ampersand > 1)
-		error = dprintf(STDERR_FILENO, "sh: syntax error - too many\
-				ampersands in your aggregator\n");
+		error = ft_printfd(STDERR_FILENO, "%s: syntax error - too many ampersands in your aggregator\n", SH_NAME);
 	else if (ag->type == ERROR)
-		error = dprintf(STDERR_FILENO, "sh: syntax error in your\
-				aggregator\n");
+		error = ft_printfd(STDERR_FILENO, "%s: syntax error in your aggregator\n", SH_NAME);
 	if (error)
 		ag->type = ERROR;
 	return (error);
@@ -63,6 +54,10 @@ int				find_aggregator_type(t_env *e)
 	ag.nb_ampersand = 0;
 	ag.type = -1;
 	while (e->magic[RED_INDEX].cmd[++i] && !nb_elems_is_invalid(&ag))
+	{
 		assign_nb_elems_in_struct(&ag, e->magic[RED_INDEX].cmd[i]);
+		if (ag.type != -1)
+			return (ag.type);
+	}
 	return (ag.type);
 }
