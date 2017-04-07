@@ -13,13 +13,13 @@ int		print_history(t_env *e, char **cmd)
 	{
 		arg = (size_t)atoi_bis(cmd[1]);
 		if (arg == -1)
-			return (history_error_with_id(cmd, SH_NAME, 2));
+			return (ft_error("history", cmd[1], "too many arguments"));
 		i = ft_tablen(e->history) - arg - 1;
 	}
 	if (i + 1 > (size_t)len_tab)
 		i = -1;
 	while (e->history[++i])
-		ft_printf("%d: %s\n", (i + 1), e->history[i]);
+		ft_printf("%d: %s\n", i, e->history[i]);
 	return (1);
 }
 
@@ -43,12 +43,12 @@ int		append_history_file_in_list(t_env *e)
 	int		i;
 
 	if ((history_fd = open(HIST_FILE, O_RDWR | O_CREAT, OFLAGS)) == -1)
-		return (ft_error(SH_NAME, "Cannot read", HIST_FILE));
+		return (ft_error("Cannot read", HIST_FILE, NULL));
 	len = ft_tablen(e->history) + 4096;
 	nb_lines = 0;
 	i = -1;
 	if ((new = malloc(sizeof(e->history) * len)) == NULL)
-		return (ft_error(SH_NAME, "Malloc failed.", NULL));
+		return (ft_error(NULL, "Malloc failed.", NULL));
 	while (e->history[++i])
 		new[i] = e->history[i];
 	new[i] = NULL;

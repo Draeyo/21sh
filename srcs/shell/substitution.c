@@ -1,4 +1,7 @@
 #include "shell.h"
+#include <sys/types.h>
+#include <pwd.h>
+#include <uuid/uuid.h>
 
 static char	*pre_substitution(char **new, char **ret, char *target, int len)
 {
@@ -40,21 +43,19 @@ void		do_substitution(char **target, int *curr_pos, char *substitute,
 	ft_strdel(&tmp);
 }
 
-static void	substitution_tilde(t_env *e, char **str, int i, char *user_dir)
+static void	substitution_tilde(t_env *e, char **str, int i)
 {
-	char	*tmp;
+	char			*tmp;
 
+	tmp = NULL;
 	if ((*str)[i] == '~' && (*str)[i + 1] && (*str)[i + 1] != ' '
-		&& ft_isalnum((*str)[i + 1]) && (i == 0
+		&& (*str)[i + 1] != '/' && (*str)[i + 1] != '$' && (i == 0
 		|| (*str)[i - 1] == ' '))
 	{
-		tmp = ft_strdup((*str));
-		do_substitution(str, &i, user_dir, 0);
-		if (access(&(*str)[i], F_OK) == -1)
-		{
-			ft_strdel(str);
-			*str = tmp;
-		}
+		if ((tmp = ft_getpath_login(&(*str)[i + 1])))
+			do_substitution(str, &i, tmp, ft_strlen(&(*str)[i + 1]));
+		else
+			substitution_cond(str, &i, tmp);
 	}
 	else if ((*str)[i] == '~' && (i == 0 || (*str)[i - 1] == ' ')
 			&& (!(*str)[i + 1] || ((*str)[i + 1] != '~'
@@ -71,17 +72,18 @@ static void	substitution_tilde(t_env *e, char **str, int i, char *user_dir)
 int			substitution(t_env *e, char **str)
 {
 	int		i;
-	char	*user_dir;
+	int		len;
 
 	i = -1;
-	user_dir = ft_strdup("/Users/");
-	while ((*str)[++i])
+	len = (int)ft_strlen(*str);
+	if (!(*str))
+		return (0);
+	while (str && ++i < len && (*str)[i])
 	{
-		if ((*str)[i] == '$' && (*str)[i + 1])
+		if (i < len && (*str)[i] == '$' && (*str)[i + 1])
 			do_env_subs(e, str, &i);
 		else
-			substitution_tilde(e, str, i, user_dir);
+			substitution_tilde(e, str, i);
 	}
-	strfree(&user_dir);
 	return (0);
 }

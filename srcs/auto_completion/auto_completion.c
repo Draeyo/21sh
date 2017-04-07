@@ -69,7 +69,7 @@ char		*add_backquote(t_env *e, char *str, int i)
 	char	*ret;
 
 	x = i;
-	quote = cur_inquote(e);
+	quote = cur_inquote(e->line, NB_MOVE - 1);
 	if (quote)
 	{
 		if (quote == 1)
@@ -82,7 +82,7 @@ char		*add_backquote(t_env *e, char *str, int i)
 	else
 	{
 		while (x > 0 && ((str[x] != ' ' && str[x] != '	'
-			&& str[x] != '\'' && str[x] != '\"') || str[x - 1] == '\\'))
+			&& str[x] != '\'' && str[x] != '\"') || ft_is_escaped(str, x)))
 			x--;
 	}
 	if (str[x] == quote || str[x] == ' ')

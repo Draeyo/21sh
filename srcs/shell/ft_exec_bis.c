@@ -57,7 +57,7 @@ char	*ft_find_exec(char **paths, char *cmd)
 	path = NULL;
 	if (!cmd || !cmd[0])
 		return (NULL);
-	if ((cmd[0] == '.' || cmd[0] == '/'))
+	if (cmd && (cmd[0] == '.' || cmd[0] == '/'))
 		return (ft_isexec(cmd) ? ft_strdup(cmd) : NULL);
 	while (paths[++i])
 		if ((exec = ft_find_exec_readdir(paths[i], cmd)) != NULL)
@@ -91,8 +91,5 @@ char	**ft_find_paths(char **env)
 void	ft_close(int fd)
 {
 	if (fd != 1 && fd != 0)
-	{
-		if (close(fd) == -1)
-			ft_error(SH_NAME, "IO stream error.\n", NULL);
-	}
+		close(fd);
 }

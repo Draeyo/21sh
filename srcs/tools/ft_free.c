@@ -19,9 +19,9 @@ void	ft_env_free(t_env *e)
 	strfree(&e->home);
 	strfree(&e->prompt);
 	strfree(&HIST_FILE);
-	strfree(&e->last_cmd);
 	strfree(&e->herestock);
 	strfree(&e->last_ret);
+	strfree(&e->susp);
 	if (e->env)
 		ft_free_tab(e->env);
 	if (e->history)

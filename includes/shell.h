@@ -58,6 +58,7 @@
 # define ITALIC			"\x1b[3m"
 # define SH_NAME		"21sh"
 # define PATH			"/usr/bin:/bin:/usr/sbin:/sbin"
+# define USERS_DIR		"/Users/"
 # define FD				e->fd
 # define BUF			e->buf
 # define TCAPS			e->tcaps
@@ -149,6 +150,18 @@ typedef struct			s_tputs
 	char				*up;
 }						t_tputs;
 
+typedef struct			s_opt_hist
+{
+	int					a : 2;
+	int					c : 2;
+	int					d : 2;
+	int					i_opt_d;
+	int					h : 2;
+	int					w : 2;
+	int					r : 2;
+	int					p : 2;
+}						t_opt_hist;
+
 typedef struct			s_aggre_elems
 {
 	int					nb_chevron;
@@ -225,7 +238,6 @@ typedef struct			s_env
 	char				*prompt;
 	char				*home;
 	char				*line;
-	char				*last_cmd;
 	char				*line_bkp;
 	char				**cmd;
 	char				***cat;
@@ -271,6 +283,8 @@ typedef struct			s_env
 	int					is_valid_pipe;
 	int					hdoc_index;
 	int					last_cmd_ret;
+	char				multi_quote;
+	char				*susp;
 }						t_env;
 
 /*
@@ -286,8 +300,8 @@ int						ft_freelogic(t_logic *x);
 t_logic					*ft_split_logic(t_logic *x, char **cmd);
 t_logic					*ft_new_logic(void);
 int						ft_check_op(char *s);
-int						ft_waitlogix(t_env *e);
 int						substitution(t_env *e, char **target);
+void					substitution_cond(char **str, int *i, char *tmp);
 int						manage_exclamation_mark(t_env *e, int *curr_pos);
 int						error_em(char *arg, char *sh_name);
 int						manage_double_excl_mark(t_env *e, int *curr_pos);
@@ -349,7 +363,7 @@ int						is_or(t_env *e, int i);
 int						find_nxt_operator(t_env *e);
 void					ft_dupp(t_env *e);
 void					output_aggre(t_env *e, int fd_src, int fd_dst);
-void					close_aggre(t_env *e, int fd_src, int fd_dst);
+void					close_aggre(t_env *e, int fd_src);
 int						space_after_aggre(char *s);
 int						is_output_after(t_env *e, int i);
 
@@ -358,7 +372,7 @@ int						is_output_after(t_env *e, int i);
 */
 int						ft_reset_line(t_env *e);
 int						ft_init(t_env *e, char **env);
-int						ft_set_home(t_env *e);
+int						ft_set_home(t_env *e, char *path);
 void					ft_set_shlvl(t_env *e);
 
 /*
@@ -373,6 +387,8 @@ t_env					*env_access(t_env *e);
 /*
 **		Tools
 */
+int						ft_pairs(char *str);
+int						check_pairs(char *str, char c, char d);
 int						ft_matchquotes(char *str);
 int						red_strstr(char *str);
 int						ft_subs_tilde(t_env *e);
@@ -380,7 +396,7 @@ int						is_number(char c);
 int						is_only_numbers(char *str);
 int						ft_multiline(t_env *e);
 int						is_bad_line(char *line);
-int						check_quote(char *s);
+char					check_quote(t_env *e, char *s);
 char					*ft_strdup_wo_quote_bs(char *s);
 int						ft_isspace(char c);
 int						ft_start_with(char *str, char *comp);
@@ -404,6 +420,11 @@ int						token_error(t_env *e, int id);
 int						is_last_cmd(t_env *e, int i);
 int						ft_catlen(char ***cat);
 char					*ft_xtoa(intmax_t nb);
+char					*ft_getpath_uid(int uid, char *path);
+char					*ft_getpath_login(char *login);
+void					init_opt_hist(t_opt_hist *opt);
+int						get_hist_options(int i, char **cmd, t_opt_hist *opt);
+int						exit_in_read(t_env *e);
 
 /*
 **		History
@@ -420,17 +441,15 @@ int						print_history(t_env *e, char **cmd);
 int						clear_history_list(t_env *e);
 int						append_history_file_in_list(t_env *e);
 int						print_history_help(void);
-int						history_delete_error(char *sh_name, char **cmd);
 int						history_error_with_id(char **cmd, char *sh_name, \
 							int id);
-int						is_valid_arg(char **cmd, char *sh_name);
 
 /*
 **		Tcaps Tools
 */
 void					xputs(char *tag);
 void					move_right(t_env *e);
-void					tcaps_enter(t_env *e);
+int						tcaps_enter(t_env *e);
 
 /*
 **		Realloc
@@ -438,6 +457,7 @@ void					tcaps_enter(t_env *e);
 char					*ft_realloc_line(t_env *e, char c);
 char					*ft_realloc_insert_char(t_env *e, char c);
 char					*ft_realloc_delete_char(t_env *e, int pos);
+char					*ft_delete_char(char *str, int pos);
 void					ft_realloc_insert_str(t_env *e, char *str);
 
 /*
@@ -465,6 +485,9 @@ int						ft_pwd(t_env *e, char **cmd);
 int						ft_echo(char **args);
 int						ft_where(t_env *e, char **cmd);
 int						ft_exit(t_env *e, char **cmd);
+int						manage_opt_hist_priority(t_opt_hist *opt);
+int						is_valid_opt(char c);
+void					add_opt(t_opt_hist *opt, char c, int *opt_d, int i);
 
 /*
 **		Termcaps
@@ -496,6 +519,10 @@ void					tcaps_ctrl_arrow(t_env *e);
 void					tcaps_ctrl_end(t_env *e);
 void					tcaps_cut_paste(t_env *e);
 void					clear_cmd(t_env *e);
+void					print_new_cmd_from_history(t_env *e);
+void					print_last_cmd(t_env *e);
+int						locate_history(char **history, int c_pos, \
+							char *comp, int dir);
 void					tcaps_ctrl_d(t_env *e);
 void					init_tputs_string(t_env *e);
 int						tcaps_init(t_env *e);
@@ -519,7 +546,6 @@ int						is_redit_sign(char c);
 int						ft_check_input(int i, t_env *e);
 int						ft_check_output(int i, t_env *e);
 int						ft_check_heredoc(int i, t_env *e);
-void					check_magic_cmd(t_env *e);
 int						check_magic_red(t_env *e);
 int						check_magic_content(t_env *e, int i);
 
@@ -535,7 +561,7 @@ void					ft_putstr_spec(t_env *e, char *str);
 int						valid_selection(t_env *e);
 void					tcaps_manage_printable_char(t_env *e);
 int						tcaps_is_delete_key(t_env *e);
-int						cur_inquote(t_env *e);
+int						cur_inquote(char *str, int pos);
 void					complete_arg(t_env *e, char *arg);
 char					*ft_pick_color(char *perm);
 char					ft_file_type(int mode);
@@ -555,28 +581,31 @@ char					*escape_specials(char *str, int i, int len);
 /*
 **      Parse Command
 */
-void					parse_command(t_env *e);
+int						parse_command(t_env *e);
 void					check_parsing_simple(t_env *e, int *i, char c);
 void					check_parsing_double(t_env *e, int *i, char c);
 void					check_parsing_ampersand(t_env *e, int *i);
 void					insert_char(t_env *e, char c, int pos);
+void					insert_char_in_line(char **str, char c, int pos);
 void					delete_char(t_env *e, int pos);
 
 /*
 **		Chdir
 */
-int						ft_pre_chdir(char **tmp, char **a, char *dir, t_env *e);
+int						ft_pre_chdir(char **tmp, char *dir, t_env *e);
 int						ft_chdir_error(char *path);
 int						ft_cd_check_option(char ***argv);
-char					*ft_save_oldpwd(char **argv, t_env *e);
+char					*ft_save_oldpwd(t_env *e);
 char					*ft_create_path(char **paths, int process);
-char					*ft_repstr(char **argv, char *s1, char *s2, t_env *e);
+char					*ft_repstr(char *s1, char *s2, t_env *e);
 void					ft_fill_array(void **array, void *a1, void *a2, \
 							void *a3);
 void					ft_array_strdel(char **array);
 void					ft_remove_usless_slash(char *str);
 void					ft_replace_word(char **s1, char *s2, char **s3, int i);
 
-char *ft_create_prompt(t_env *e, char *prompt);
+char					*ft_create_prompt(t_env *e, char *prompt);
+int						ft_is_escaped(char *str, int i);
+int						ft_is_escape_after(char *str, int i);
 
 #endif
