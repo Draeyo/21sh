@@ -1,9 +1,16 @@
-#include "shell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_cmds_split.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/07 14:17:36 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/07 14:17:36 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-/*
-**	COUNT THE NUMBER OF REDIRECTIONS IN CMD
-**	TODO: ajouter reconnaissance de "&&" "||" "n%>n"
-*/
+#include "shell.h"
 
 static int	ft_nb_cmds(t_env *e)
 {

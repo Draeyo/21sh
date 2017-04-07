@@ -1,19 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/07 14:24:37 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/07 14:27:16 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SHELL_H
 # define SHELL_H
-
-/*
-**	<unistd.h> :		[ chdir | access ]
-**		(ft_chdir)
-**	<sys/stat.h> :		[ lstat ]
-**		(ft_chdir)
-**	<dirent.h> :		[ opendir | readdir ]
-**		(ft_exec)
-**	<fcntl.h> :		[ open | read ]
-**		(ft_history.c)
-**	<signal.h> :		[ signal ]
-**		(ft_signal)
-
-*/
 
 # define UATTR __attribute__((unused))
 
