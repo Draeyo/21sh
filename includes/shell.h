@@ -1,19 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/14 11:04:38 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:07:57 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SHELL_H
 # define SHELL_H
-
-/*
-**	<unistd.h> :		[ chdir | access ]
-**		(ft_chdir)
-**	<sys/stat.h> :		[ lstat ]
-**		(ft_chdir)
-**	<dirent.h> :		[ opendir | readdir ]
-**		(ft_exec)
-**	<fcntl.h> :		[ open | read ]
-**		(ft_history.c)
-**	<signal.h> :		[ signal ]
-**		(ft_signal)
-
-*/
 
 # define UATTR __attribute__((unused))
 
@@ -291,7 +289,7 @@ typedef struct			s_env
 	int					last_cmd_ret;
 	char				multi_quote;
 	char				*susp;
-	int 				env_exec;
+	int					env_exec;
 }						t_env;
 
 /*
