@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   do_substitution.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/14 10:58:32 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:02:39 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 static char	*pre_substitution(char **new, char **ret, char *target, int len)
@@ -38,8 +50,8 @@ void		do_substitution(char **target, int *curr_pos, char *substitute,
 	ft_strdel(&tmp);
 }
 
-void		do_substitution_no_esc(char **target, int *curr_pos, char *substitute,
-							int jmp)
+void		do_substitution_no_esc(char **target, int *curr_pos,
+		char *substitute, int jmp)
 {
 	char	*new;
 	char	*tmp;

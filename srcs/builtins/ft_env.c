@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_env.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/14 10:57:37 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:02:11 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 static size_t	ft_arglen(char **cmd, size_t len, int i)
@@ -95,7 +107,6 @@ int				ft_env(t_env *e, char **cmd)
 	i = 1;
 	env_cpy = ft_tabdup(e->env);
 	tmp = e->env;
-//	e->env = env_cpy;
 	if ((len = ft_tablen(cmd)) > 1)
 	{
 		if ((i = ft_env_opt(&env_cpy, len, cmd)) > 0)
@@ -104,7 +115,6 @@ int				ft_env(t_env *e, char **cmd)
 	else
 		ft_puttab(e->env);
 	ft_free_tab(env_cpy);
-	//ft_free_tab(e->env);
 	e->env = tmp;
 	if (!i)
 		return (1);

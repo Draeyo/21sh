@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   manage_exclamation_mark.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/04/14 10:59:11 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:02:58 by vlistrat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 static int	manage_for_pos_number(t_env *e, int *curr_pos)
@@ -59,7 +71,7 @@ static int	manage_for_string(t_env *e, int *curr_pos)
 		&& (!i || (e->line[start + i] == '\'' && e->line[start + i] == '\"'))
 		&& !ft_is_escape_after(e->line, start + i))
 		i++;
-	cmp = ft_strsub(e->line, start, i+1);
+	cmp = ft_strsub(e->line, start, i + 1);
 	i = ft_tablen(e->history) - 1;
 	while (cmp && i && !ft_start_with(e->history[i], cmp))
 		--i;
