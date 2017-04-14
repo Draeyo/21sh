@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:01:02 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:01:02 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/14 12:08:35 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,5 @@ void	tcaps_clear(t_env *e)
 {
 	xputs(TGETSTR_CL);
 	ft_prompt(e->prompt);
-	ft_printf("%s", e->line);
+	ft_printf("%s", e->line ? e->line : "");
 }
