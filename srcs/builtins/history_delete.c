@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/14 10:57:59 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 10:57:59 by vlistrat         ###   ########.fr       */
+/*   Created: 2017/04/14 11:59:36 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:59:36 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ int			history_delete(t_env *e, char **cmd, int i)
 		strfree(&arg);
 		return (ft_error("history", cmd[i], "position out of range"));
 	}
-	strfree(&arg);
 	tmp = e->history;
 	e->history = delete_line_in_tab(e->history, --len);
 	ft_free_tab(tmp);

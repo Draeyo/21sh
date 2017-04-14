@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/14 11:00:09 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 11:00:09 by vlistrat         ###   ########.fr       */
+/*   Created: 2017/04/14 12:01:27 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 12:01:27 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,7 @@ void	ft_triple_free(t_env *e)
 		{
 			j = -1;
 			while (e->cat[i][++j])
-			{
-				free(e->cat[i][j]);
-				e->cat[i][j] = NULL;
-			}
+				strfree(&e->cat[i][j]);
 			free(e->cat[i]);
 			e->cat[i] = NULL;
 		}

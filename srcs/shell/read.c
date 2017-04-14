@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/14 10:59:16 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 10:59:16 by vlistrat         ###   ########.fr       */
+/*   Created: 2017/04/14 12:00:25 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 12:00:25 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int				reading(t_env *e)
 		e->line = ft_realloc_delete_char(e, NB_MOVE - 1);
 	if (tcaps_check_key(BUF, 10, 0, 0))
 		tcaps_enter(e);
-	else
+	else if (!e->raw)
 		tcaps(e);
 	ft_bzero(&BUF, 3);
 	RED_INDEX = 0;

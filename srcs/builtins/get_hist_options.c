@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/14 10:57:56 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 10:57:56 by vlistrat         ###   ########.fr       */
+/*   Created: 2017/04/14 11:59:33 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 11:59:33 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ static int	get_opt_in_one_arg(int i, char **cmd, t_opt_hist *opt)
 			return (manage_suspend_opt(i, cmd, opt));
 		else if (cmd[i][j] != '-' && !is_number(cmd[i][j]))
 			return (hist_invalid_option(cmd[i][j]));
+		else if (!is_only_numbers(cmd[i]))
+			return (ft_error("history", cmd[i], "numeric argument required"));
 		if (opt_d && cmd[i + 2])
 			++i;
 	}

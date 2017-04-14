@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/14 11:00:17 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 11:00:17 by vlistrat         ###   ########.fr       */
+/*   Created: 2017/04/14 12:01:34 by vlistrat          #+#    #+#             */
+/*   Updated: 2017/04/14 12:03:30 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	*ft_realloc_delete_char(t_env *e, int pos)
 	int		j;
 
 	if (e->line)
-		len = (int)ft_strlen(e->line) - 1;
+		len = (int)ft_strlen(e->line);
 	else
 		return (NULL);
 	if (!(new = ft_strnew(len)))
