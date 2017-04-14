@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 11:59:20 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 11:59:20 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/14 13:03:38 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int		ft_env_error(char *cmd)
 {
 	ft_error("env", "illegal option --", cmd);
-	ft_error("\nusage", "env [-i name1=val1 ...] [-u name]", NULL);
+	ft_error("usage", "env [-i name1=val1 ...] [-u name]", NULL);
 	return (-1);
 }
 
