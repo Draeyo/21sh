@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:09 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:09 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 12:14:27 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int			ft_check_token(char *s)
 	tok = 0;
 	bs = 0;
 	i = -1;
-	while (s[++i])
+	while (s && ++i < (int)ft_strlen(s) && s[i])
 	{
 		if (!bs && s[i] == '\\' && quote != '\'')
 			bs = 1;
