@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:01:42 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:01:42 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 11:58:21 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,8 @@ char	*ft_issetenv(char **env, char *name)
 	int		i;
 
 	i = -1;
-	eval = ft_strjoin(name, "=");
+	if (!(eval = ft_strjoin(name, "=")))
+		return (NULL);
 	if (env)
 	{
 		while (env[++i])
@@ -79,7 +80,7 @@ char	*ft_issetenv(char **env, char *name)
 			}
 		}
 	}
-	free(eval);
+	strfree(&eval);
 	return (NULL);
 }
 
