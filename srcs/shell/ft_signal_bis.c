@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:15 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:15 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 18:10:54 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,9 @@ static void	ft_sigint_reset(t_env *e)
 		e->hdoc_nb = 0;
 		strfree(&e->herestock);
 		strfree(&e->line);
-		if (e->hdoc_words)
-		{
-			ft_free_tab(e->hdoc_words);
-			e->hdoc_words = NULL;
-		}
 		strfree(&MULTI);
 		HIST_MOVE = -1;
+		ft_reset_heredocs(e);
 		ft_putstr("\n\n");
 		strfree(&e->prompt);
 		e->prompt = ft_create_prompt(e, STD_PROMPT);

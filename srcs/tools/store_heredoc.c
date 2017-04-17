@@ -6,17 +6,17 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:01:53 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:02:01 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 17:59:11 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-static int	put_new_node(t_env *e, int *same_node)
+static int	put_new_node(t_env *e)
 {
 	t_list	*new;
 
-	if (*same_node != e->hdoc_nb)
+	if (e->same_node != e->hdoc_nb)
 	{
 		if (!(new = (t_list *)malloc(sizeof(t_list))))
 			return (-1);
@@ -33,12 +33,12 @@ static int	put_new_node(t_env *e, int *same_node)
 			e->hdoc->next = new;
 			e->hdoc = e->hdoc->next;
 		}
-		*same_node = e->hdoc_nb;
+		e->same_node = e->hdoc_nb;
 	}
 	return (1);
 }
 
-static int	replace_line(t_env *e, int *same_node)
+static int	replace_line(t_env *e)
 {
 	strfree(&e->line);
 	if (!e->hdoc->content)
@@ -49,7 +49,7 @@ static int	replace_line(t_env *e, int *same_node)
 		strfree(&e->herestock);
 		strfree(&e->prompt);
 		e->prompt = ft_create_prompt(e, STD_PROMPT);
-		*same_node = -1;
+		e->same_node = -1;
 		e->hdoc_index = -1;
 		e->hdoc = e->b_hdoc;
 		if (e->hdoc_words)
@@ -70,9 +70,8 @@ static int	replace_line(t_env *e, int *same_node)
 int			store_heredoc(t_env *e)
 {
 	char		**tmp;
-	static int	same_node = -1;
 
-	if ((put_new_node(e, &same_node)) < 0)
+	if ((put_new_node(e)) < 0)
 		return (-1);
 	if (e->hdoc_index >= 0 && ft_strcmp(e->line, e->hdoc_words[e->hdoc_index]))
 	{
@@ -88,7 +87,7 @@ int			store_heredoc(t_env *e)
 		ft_prompt(e->prompt);
 	}
 	else
-		return (replace_line(e, &same_node));
+		return (replace_line(e));
 	NB_READ = 0;
 	NB_MOVE = 0;
 	strfree(&e->line);

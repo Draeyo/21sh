@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:01:36 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:01:36 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 18:06:20 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,17 @@ static void	free_hdoc_list(t_env *e)
 	e->b_hdoc = NULL;
 }
 
+int			ft_reset_heredocs(t_env *e)
+{
+	e->same_node = -1;
+	e->hdoc_index = -1;
+	if (e->hdoc_words)
+		ft_free_tab(e->hdoc_words);
+	e->hdoc_words = NULL;
+	free_hdoc_list(e);
+	return (1);
+}
+
 int			ft_reset_line(t_env *e)
 {
 	if (e->raw)
@@ -36,7 +47,7 @@ int			ft_reset_line(t_env *e)
 	strfree(&e->line);
 	strfree(&e->line_bkp);
 	strfree(&MULTI);
-	free_hdoc_list(e);
+	ft_reset_heredocs(e);
 	NB_MOVE = 0;
 	NB_READ = 0;
 	HIST_MOVE = -1;

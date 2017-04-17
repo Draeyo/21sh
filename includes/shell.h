@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 11:04:38 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 11:07:57 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 18:05:21 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ typedef struct			s_env
 	char				multi_quote;
 	char				*susp;
 	int					env_exec;
+	int					same_node;
 }						t_env;
 
 /*
@@ -473,6 +474,7 @@ void					ft_free_line(t_env *e);
 void					ft_env_free(t_env *e);
 void					ft_triple_free(t_env *e);
 void					strfree(char **str);
+int						ft_reset_heredocs(t_env *e);
 
 /*
 **		Builtins

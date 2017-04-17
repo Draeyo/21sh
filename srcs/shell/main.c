@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:20 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:20 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 17:19:37 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ static void	midline_insert(t_env *e, int s_move, int len)
 		xputs(TGETSTR_ND);
 }
 
+static int	ft_isatty(void)
+{
+	if (!isatty(STDIN_FILENO))
+	{
+		ft_printfd(2, "Invalid input.\n");
+		return (0);
+	}
+	return (1);
+}
+
 void		tcaps_manage_printable_char(t_env *e)
 {
 	int		len;
@@ -80,7 +90,8 @@ int			main(int ac, char **av, char **env)
 	t_env	*e;
 	int		ret;
 
-	e = (t_env *)malloc(sizeof(t_env));
+	if (!(e = (t_env *)malloc(sizeof(t_env))) || !ft_isatty())
+		return (-1);
 	env_access(e);
 	(void)ac;
 	(void)av;

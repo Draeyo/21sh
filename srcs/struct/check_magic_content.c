@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:27 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:27 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 17:14:32 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,24 @@ static int	check_magic_content_bis(t_env *e, int i)
 	return (0);
 }
 
+static int	is_device(t_env *e, int i)
+{
+	struct stat	stat;
+
+	ft_bzero(&stat, sizeof(struct stat));
+	lstat(e->magic[i].cmd, &stat);
+	if (stat.st_rdev)
+		return (1);
+	return (0);
+}
+
 int			check_magic_content(t_env *e, int i)
 {
+	if (is_input_redir(e, i) && is_magic(e, i + 1) && is_device(e, i + 1))
+	{
+		return (ft_error(e->magic[i + 1].cmd,
+					"device can't be used as stdin", NULL));
+	}
 	if (!e->magic[i + 1].cmd && is_redirection(e, i)
 		&& !is_redir_pipe(e, i) && !is_aggregator(e, i + 1) && \
 		!is_aggregator(e, i))

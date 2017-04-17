@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:06 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:06 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 17:56:29 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ static void		ft_init_bis(t_env *e)
 	e->is_out_close = 0;
 	e->is_valid_pipe = 1;
 	e->env_exec = 0;
+	e->same_node = -1;
 	ft_init_ter(e);
 }
 

@@ -6,7 +6,7 @@
 /*   By: vlistrat <vlistrat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/14 12:00:55 by vlistrat          #+#    #+#             */
-/*   Updated: 2017/04/14 12:00:55 by vlistrat         ###   ########.fr       */
+/*   Updated: 2017/04/17 17:20:03 by vlistrat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	struct_init(int len, t_magic *magic)
 
 int		is_magic(t_env *e, int i)
 {
-	if (e->magic[i].cmd)
+	if (i < (int)e->len_mag && e->magic[i].cmd)
 		return (1);
 	return (0);
 }
